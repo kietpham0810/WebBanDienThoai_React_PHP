@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 11, 2026 at 07:43 PM
+-- Generation Time: Mar 13, 2026 at 04:32 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,16 +53,17 @@ CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `order_date` datetime DEFAULT NULL,
-  `total` int(11) DEFAULT NULL
+  `total` int(11) DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `order_date`, `total`) VALUES
-(1, 2, '2026-03-12 01:42:47', 33990000),
-(2, 3, '2026-03-12 01:42:47', 8990000);
+INSERT INTO `orders` (`id`, `user_id`, `order_date`, `total`, `status`) VALUES
+(1, 2, '2026-03-12 01:42:47', 33990000, 'pending'),
+(2, 3, '2026-03-12 01:42:47', 8990000, 'pending');
 
 -- --------------------------------------------------------
 
