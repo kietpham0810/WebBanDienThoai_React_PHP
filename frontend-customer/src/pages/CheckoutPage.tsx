@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Resolver, useForm } from 'react-hook-form';
@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
 import { clearCart } from '../features/cart/cartSlice';
+import { orderService } from '../services/orderService';
 import { AppDispatch, RootState } from '../store';
 import { formatCurrency } from '../utils';
 
@@ -58,12 +59,19 @@ export default function CheckoutPage() {
   }, [items.length, navigate]);
 
   const onSubmit = async (data: CheckoutFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    console.log('Order Data:', { ...data, items, total: totalAmount });
-    dispatch(clearCart());
-    toast.success('Đặt hàng thành công. Nhân viên sẽ liên hệ xác nhận sớm.');
-    navigate('/');
+    try {
+      await orderService.create({
+        ...data,
+        items,
+        total: totalAmount,
+      });
+      dispatch(clearCart());
+      toast.success('Đặt hàng thành công. Nhân viên sẽ liên hệ xác nhận sớm.');
+      navigate('/');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Đặt hàng thất bại. Vui lòng thử lại.';
+      toast.error(message);
+    }
   };
 
   if (items.length === 0) {
@@ -92,7 +100,7 @@ export default function CheckoutPage() {
             <input
               {...register('fullName')}
               className="w-full rounded-xl border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Nguyen Van A"
+              placeholder="Nguyễn Văn A"
             />
             <p className="mt-1 text-xs text-red-500">{errors.fullName?.message}</p>
           </div>

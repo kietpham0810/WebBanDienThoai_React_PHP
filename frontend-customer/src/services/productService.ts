@@ -1,45 +1,51 @@
-import { mockProducts } from '../data/mockData';
+import { apiClient } from './apiClient';
 import type { Product, ProductFilters } from '../features/product/productSlice';
 
-const MOCK_DELAY = 800;
+const PRODUCTS_PATH = import.meta.env.VITE_API_PRODUCTS_PATH ?? '/products';
+const IS_STATIC_PRODUCTS = PRODUCTS_PATH.endsWith('.json');
+
+const applyFilters = (items: Product[], params: ProductFilters = {}) => {
+  const { category, brand, q } = params;
+  let filtered = [...items];
+
+  if (category) {
+    filtered = filtered.filter((product) => product.category === category);
+  }
+
+  if (brand) {
+    filtered = filtered.filter((product) => product.brand === brand);
+  }
+
+  if (q) {
+    const normalizedQuery = q.toLowerCase();
+    filtered = filtered.filter((product) => product.name.toLowerCase().includes(normalizedQuery));
+  }
+
+  return filtered;
+};
 
 export const productService = {
   getAll: async (params: ProductFilters = {}): Promise<Product[]> => {
-    return new Promise<Product[]>((resolve) => {
-      setTimeout(() => {
-        const { category, brand, q } = params;
-        let filtered = [...mockProducts];
+    if (IS_STATIC_PRODUCTS) {
+      const items = await apiClient.get<Product[]>(PRODUCTS_PATH);
+      return applyFilters(items, params);
+    }
 
-        if (category) {
-          filtered = filtered.filter((product) => product.category === category);
-        }
-
-        if (brand) {
-          filtered = filtered.filter((product) => product.brand === brand);
-        }
-
-        if (q) {
-          const normalizedQuery = q.toLowerCase();
-          filtered = filtered.filter((product) => product.name.toLowerCase().includes(normalizedQuery));
-        }
-
-        resolve(filtered);
-      }, MOCK_DELAY);
-    });
+    return apiClient.get<Product[]>(PRODUCTS_PATH, params as Record<string, string | number | boolean | null | undefined>);
   },
 
   getById: async (id: number): Promise<Product> => {
-    return new Promise<Product>((resolve, reject) => {
-      setTimeout(() => {
-        const product = mockProducts.find((item) => item.id === Number(id));
+    if (IS_STATIC_PRODUCTS) {
+      const items = await apiClient.get<Product[]>(PRODUCTS_PATH);
+      const found = items.find((product) => product.id === id);
 
-        if (product) {
-          resolve(product);
-          return;
-        }
+      if (!found) {
+        throw new Error('Product not found');
+      }
 
-        reject(new Error('Product not found'));
-      }, MOCK_DELAY);
-    });
+      return found;
+    }
+
+    return apiClient.get<Product>(`${PRODUCTS_PATH}/${id}`);
   },
 };

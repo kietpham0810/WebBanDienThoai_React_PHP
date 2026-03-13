@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { loginSuccess } from '../features/auth/authSlice';
+import { authService } from '../services/authService';
 import { AppDispatch, RootState } from '../store';
 
 interface LoginFormData {
@@ -18,8 +19,8 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     defaultValues: {
-      email: 'user@example.com',
-      password: '123456',
+      email: '',
+      password: '',
     },
   });
   const dispatch = useDispatch<AppDispatch>();
@@ -34,18 +35,15 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, navigate, redirectTo]);
 
-  const onSubmit = (data: LoginFormData) => {
-    if (data.email === 'user@example.com' && data.password === '123456') {
-      dispatch(
-        loginSuccess({
-          user: { id: '1', name: 'Nguyễn Văn User', email: data.email },
-          token: 'mock-jwt-token',
-        }),
-      );
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const response = await authService.login(data.email, data.password);
+      dispatch(loginSuccess(response));
       toast.success('Đăng nhập thành công.');
       navigate(redirectTo, { replace: true });
-    } else {
-      toast.error('Email hoặc mật khẩu chưa đúng. Tài khoản demo: user@example.com / 123456');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
+      toast.error(message);
     }
   };
 
@@ -84,12 +82,6 @@ export default function LoginPage() {
           {isSubmitting ? 'Đang xử lý...' : 'Đăng nhập'}
         </button>
       </form>
-
-      <div className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
-        <p className="font-semibold text-slate-900">Tài khoản demo</p>
-        <p className="mt-1">Email: user@example.com</p>
-        <p>Mật khẩu: 123456</p>
-      </div>
 
       <p className="mt-5 text-center text-sm text-slate-500">
         Muốn xem sản phẩm trước?{' '}

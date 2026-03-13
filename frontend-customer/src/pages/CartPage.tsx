@@ -1,16 +1,9 @@
-import { useDispatch, useSelector } from 'react-redux';
+﻿import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { removeFromCart, updateQuantity } from '../features/cart/cartSlice';
-import { mockProducts } from '../data/mockData';
 import { AppDispatch, RootState } from '../store';
 import { formatCurrency } from '../utils';
-
-function CartItemImage({ id, name, image }: { id: number; name: string; image: string }) {
-  const mappedImage = mockProducts.find((product) => product.id === id)?.image ?? image;
-
-  return <img src={mappedImage} alt={name} className="h-24 w-24 rounded-2xl bg-slate-50 object-contain" referrerPolicy="no-referrer" />;
-}
 
 export default function CartPage() {
   const { items, totalAmount } = useSelector((state: RootState) => state.cart);
@@ -49,7 +42,12 @@ export default function CartPage() {
         <div className="space-y-4 lg:col-span-2">
           {items.map((item) => (
             <div key={item.id} className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
-              <CartItemImage id={item.id} name={item.name} image={item.image} />
+              <img
+                src={item.image}
+                alt={item.name}
+                className="h-24 w-24 rounded-2xl bg-slate-50 object-contain"
+                referrerPolicy="no-referrer"
+              />
 
               <div className="flex-1">
                 <h2 className="font-semibold text-slate-900">{item.name}</h2>

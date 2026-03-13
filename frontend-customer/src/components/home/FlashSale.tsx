@@ -1,4 +1,4 @@
-import { Zap } from 'lucide-react';
+﻿import { Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../../features/product/components/ProductCard';
 import type { Product } from '../../features/product/productSlice';

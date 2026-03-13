@@ -1,0 +1,32 @@
+[
+  {
+    "id": "phones",
+    "name": "Điện thoại",
+    "icon": "Smartphone"
+  },
+  {
+    "id": "laptops",
+    "name": "Laptop",
+    "icon": "Laptop"
+  },
+  {
+    "id": "tablets",
+    "name": "Tablet",
+    "icon": "Tablet"
+  },
+  {
+    "id": "watches",
+    "name": "Đồng hồ",
+    "icon": "Watch"
+  },
+  {
+    "id": "accessories",
+    "name": "Phụ kiện",
+    "icon": "Headphones"
+  },
+  {
+    "id": "pc",
+    "name": "PC & Màn hình",
+    "icon": "Monitor"
+  }
+]

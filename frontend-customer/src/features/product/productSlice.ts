@@ -73,7 +73,7 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch products';
+        state.error = action.error.message || 'Không tải được danh sách sản phẩm.';
       })
       .addCase(fetchProductById.pending, (state) => {
         state.loading = true;
@@ -87,7 +87,7 @@ const productSlice = createSlice({
       })
       .addCase(fetchProductById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch product';
+        state.error = action.error.message || 'Không tải được sản phẩm.';
         state.selectedProduct = null;
       });
   },

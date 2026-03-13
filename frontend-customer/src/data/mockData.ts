@@ -400,8 +400,3 @@ export const categories = [
   { id: 'accessories', name: 'Phụ kiện', icon: 'Headphones' },
   { id: 'pc', name: 'PC & Màn hình', icon: 'Monitor' },
 ];
-
-export const banners = [
-  'https://img.tgdd.vn/imgt/f_webp,fit_outside,quality_100/https://cdn.tgdd.vn/2024/04/banner/720-220-720x220-67.png',
-  'https://img.tgdd.vn/imgt/f_webp,fit_outside,quality_100/https://cdn.tgdd.vn/2024/04/banner/720-220-720x220-72.png',
-];

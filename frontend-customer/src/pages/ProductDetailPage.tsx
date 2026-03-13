@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CreditCard, ShieldCheck, ShoppingCart, Star, Truck } from 'lucide-react';

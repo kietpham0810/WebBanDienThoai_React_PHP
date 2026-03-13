@@ -1,14 +1,29 @@
+﻿import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useSearchParams } from 'react-router-dom';
-import { categories } from '../data/mockData';
+import { fetchCategories } from '../features/category/categorySlice';
 import ProductList from '../features/product/components/ProductList';
+import { AppDispatch, RootState } from '../store';
 import { cn } from '../utils';
 
 export default function ProductsPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: categories, loading: categoriesLoading, error: categoriesError } = useSelector(
+    (state: RootState) => state.category,
+  );
   const [searchParams] = useSearchParams();
   const categoryId = searchParams.get('category');
   const searchQuery = searchParams.get('q');
 
-  const categoryName = categoryId ? categories.find((category) => category.id === categoryId)?.name : 'Tất cả sản phẩm';
+  useEffect(() => {
+    if (categories.length === 0 && !categoriesLoading) {
+      void dispatch(fetchCategories());
+    }
+  }, [categories.length, categoriesLoading, dispatch]);
+
+  const categoryName = categoryId
+    ? categories.find((category) => category.id === categoryId)?.name
+    : 'Tất cả sản phẩm';
   const title = searchQuery ? `Kết quả tìm kiếm cho "${searchQuery}"` : categoryName;
 
   return (
@@ -40,6 +55,12 @@ export default function ProductsPage() {
           >
             Tất cả
           </Link>
+          {categoriesLoading && categories.length === 0 && (
+            <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-500">Đang tải danh mục...</span>
+          )}
+          {categoriesError && categories.length === 0 && (
+            <span className="rounded-full bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600">Không tải được danh mục</span>
+          )}
           {categories.map((category) => (
             <Link
               key={category.id}

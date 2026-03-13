@@ -1,4 +1,4 @@
-import { CreditCard, Facebook, Instagram, MapPin, Phone, Youtube } from 'lucide-react';
+﻿import { CreditCard, Facebook, Instagram, MapPin, Phone, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
