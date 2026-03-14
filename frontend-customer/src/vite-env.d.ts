@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_API_CATEGORIES_PATH?: string;
   readonly VITE_API_LOGIN_PATH?: string;
   readonly VITE_API_ORDERS_PATH?: string;
+  readonly VITE_API_USERS_PATH?: string;
+  readonly VITE_API_USERS_URL?: string;
 }
 
 interface ImportMeta {

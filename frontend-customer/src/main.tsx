@@ -13,6 +13,7 @@ const ProductsPage = lazy(() => import('./pages/ProductsPage'));
 const CartPage = lazy(() => import('./pages/CartPage'));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
+const UsersPage = lazy(() => import('./pages/Users'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const LoadingFallback = () => (
@@ -32,6 +33,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route path="/cart" element={<CartPage />} />
+              <Route path="/users" element={<UsersPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="/checkout" element={<CheckoutPage />} />
