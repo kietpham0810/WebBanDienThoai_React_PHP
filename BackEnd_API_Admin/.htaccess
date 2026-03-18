@@ -1,0 +1,11 @@
+# Bật engine viết lại đường dẫn
+RewriteEngine On
+
+# Nếu người dùng không tìm kiếm một file (file tĩnh như ảnh, txt)
+RewriteCond %{REQUEST_FILENAME} !-f
+# Nếu người dùng không tìm kiếm một thư mục
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Thì gom tất cả những gì người dùng gõ trên URL (sau tên miền) 
+# truyền vào biến 'request' và gửi cho file index.php xử lý
+RewriteRule ^(.*)$ index.php?request=$1 [QSA,NC,L]
