@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 01, 2026 at 07:00 PM
+-- Generation Time: Apr 01, 2026 at 07:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -54,16 +54,18 @@ CREATE TABLE `orders` (
   `user_id` int(11) DEFAULT NULL,
   `order_date` datetime DEFAULT NULL,
   `total` int(11) DEFAULT NULL,
-  `status` varchar(50) DEFAULT 'pending'
+  `status` varchar(50) DEFAULT 'pending',
+  `shipping_address` varchar(255) DEFAULT NULL,
+  `payment_method` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `order_date`, `total`, `status`) VALUES
-(1, 2, '2026-03-12 01:42:47', 33990000, 'pending'),
-(2, 3, '2026-03-12 01:42:47', 8990000, 'pending');
+INSERT INTO `orders` (`id`, `user_id`, `order_date`, `total`, `status`, `shipping_address`, `payment_method`) VALUES
+(1, 2, '2026-03-12 01:42:47', 33990000, 'pending', NULL, NULL),
+(2, 3, '2026-03-12 01:42:47', 8990000, 'pending', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -100,20 +102,21 @@ CREATE TABLE `products` (
   `description` text DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL
+  `created_at` datetime DEFAULT NULL,
+  `stock` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `price`, `description`, `image`, `category_id`, `created_at`) VALUES
-(1, 'iPhone 15 Pro Max', 33990000, 'Điện thoại Apple cao cấp', 'iphone15.jpg', 1, '2026-03-12 01:42:47'),
-(2, 'Samsung Galaxy S24 Ultra', 29990000, 'Flagship Samsung', 's24.jpg', 1, '2026-03-12 01:42:47'),
-(3, 'OPPO Reno11 F 5G', 8990000, 'Điện thoại OPPO mới', 'oppo.jpg', 1, '2026-03-12 01:42:47'),
-(4, 'MacBook Air M2', 24490000, 'Laptop Apple M2', 'macbook.jpg', 2, '2026-03-12 01:42:47'),
-(5, 'Laptop Asus TUF Gaming F15', 19490000, 'Laptop gaming mạnh', 'asus.jpg', 2, '2026-03-12 01:42:47'),
-(6, 'iPad Air 5', 13990000, 'Tablet Apple M1', 'ipadair.jpg', 3, '2026-03-12 01:42:47');
+INSERT INTO `products` (`id`, `name`, `price`, `description`, `image`, `category_id`, `created_at`, `stock`) VALUES
+(1, 'iPhone 15 Pro Max', 33990000, 'Điện thoại Apple cao cấp', 'iphone15.jpg', 1, '2026-03-12 01:42:47', 0),
+(2, 'Samsung Galaxy S24 Ultra', 29990000, 'Flagship Samsung', 's24.jpg', 1, '2026-03-12 01:42:47', 0),
+(3, 'OPPO Reno11 F 5G', 8990000, 'Điện thoại OPPO mới', 'oppo.jpg', 1, '2026-03-12 01:42:47', 0),
+(4, 'MacBook Air M2', 24490000, 'Laptop Apple M2', 'macbook.jpg', 2, '2026-03-12 01:42:47', 0),
+(5, 'Laptop Asus TUF Gaming F15', 19490000, 'Laptop gaming mạnh', 'asus.jpg', 2, '2026-03-12 01:42:47', 0),
+(6, 'iPad Air 5', 13990000, 'Tablet Apple M1', 'ipadair.jpg', 3, '2026-03-12 01:42:47', 0);
 
 -- --------------------------------------------------------
 
@@ -126,17 +129,19 @@ CREATE TABLE `users` (
   `name` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `password` varchar(100) DEFAULT NULL,
-  `role` varchar(20) DEFAULT NULL
+  `role` varchar(20) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`) VALUES
-(1, 'Admin', 'admin@gmail.com', '123456', 'admin'),
-(2, 'Nguyen Van A', 'a@gmail.com', '123456', 'user'),
-(3, 'Tran Van B', 'b@gmail.com', '123456', 'user');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `phone`, `address`) VALUES
+(1, 'Admin', 'admin@gmail.com', '123456', 'admin', NULL, NULL),
+(2, 'Nguyen Van A', 'a@gmail.com', '123456', 'user', NULL, NULL),
+(3, 'Tran Van B', 'b@gmail.com', '123456', 'user', NULL, NULL);
 
 --
 -- Indexes for dumped tables
