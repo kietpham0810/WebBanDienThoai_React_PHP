@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 01, 2026 at 07:06 PM
+-- Generation Time: Apr 01, 2026 at 07:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -103,20 +103,21 @@ CREATE TABLE `products` (
   `image` varchar(255) DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `stock` int(11) NOT NULL DEFAULT 0
+  `stock` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `price`, `description`, `image`, `category_id`, `created_at`, `stock`) VALUES
-(1, 'iPhone 15 Pro Max', 33990000, 'Điện thoại Apple cao cấp', 'iphone15.jpg', 1, '2026-03-12 01:42:47', 0),
-(2, 'Samsung Galaxy S24 Ultra', 29990000, 'Flagship Samsung', 's24.jpg', 1, '2026-03-12 01:42:47', 0),
-(3, 'OPPO Reno11 F 5G', 8990000, 'Điện thoại OPPO mới', 'oppo.jpg', 1, '2026-03-12 01:42:47', 0),
-(4, 'MacBook Air M2', 24490000, 'Laptop Apple M2', 'macbook.jpg', 2, '2026-03-12 01:42:47', 0),
-(5, 'Laptop Asus TUF Gaming F15', 19490000, 'Laptop gaming mạnh', 'asus.jpg', 2, '2026-03-12 01:42:47', 0),
-(6, 'iPad Air 5', 13990000, 'Tablet Apple M1', 'ipadair.jpg', 3, '2026-03-12 01:42:47', 0);
+INSERT INTO `products` (`id`, `name`, `price`, `description`, `image`, `category_id`, `created_at`, `stock`, `status`) VALUES
+(1, 'iPhone 15 Pro Max', 33990000, 'Điện thoại Apple cao cấp', 'iphone15.jpg', 1, '2026-03-12 01:42:47', 0, 0),
+(2, 'Samsung Galaxy S24 Ultra', 29990000, 'Flagship Samsung', 's24.jpg', 1, '2026-03-12 01:42:47', 0, 0),
+(3, 'OPPO Reno11 F 5G', 8990000, 'Điện thoại OPPO mới', 'oppo.jpg', 1, '2026-03-12 01:42:47', 0, 0),
+(4, 'MacBook Air M2', 24490000, 'Laptop Apple M2', 'macbook.jpg', 2, '2026-03-12 01:42:47', 0, 0),
+(5, 'Laptop Asus TUF Gaming F15', 19490000, 'Laptop gaming mạnh', 'asus.jpg', 2, '2026-03-12 01:42:47', 0, 0),
+(6, 'iPad Air 5', 13990000, 'Tablet Apple M1', 'ipadair.jpg', 3, '2026-03-12 01:42:47', 0, 0);
 
 -- --------------------------------------------------------
 
