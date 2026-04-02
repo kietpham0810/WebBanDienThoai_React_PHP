@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Instrument Sans', sans-serif;
+
+  --app-bg: #f7f3ee;
+  --app-bg-soft: #f1ebe3;
+  --panel-bg: #ffffff;
+  --panel-border: #efe6dc;
+
+  --text-primary: #1f2328;
+  --text-muted: #6c6f73;
+
+  --accent: #ff7a59;
+  --accent-strong: #ff5a36;
+  --accent-soft: rgba(255, 122, 89, 0.15);
+
+  --info: #2274a5;
+  --success: #27ae60;
+  --danger: #e63946;
+
+  --shadow-lg: 0 18px 40px rgba(25, 25, 25, 0.08);
+  --shadow-md: 0 12px 24px rgba(25, 25, 25, 0.08);
+  --shadow-sm: 0 6px 16px rgba(25, 25, 25, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: radial-gradient(circle at top, #fff7ec 0%, #f5efe7 55%, #f1ebe3 100%);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
