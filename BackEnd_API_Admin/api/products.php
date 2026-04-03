@@ -1,6 +1,75 @@
 <?php
 $base_query = "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id";
 
+// Hàm xử lý upload ảnh (không dùng finfo để tương thích XAMPP)
+function handleImageUpload($file_input_name = 'image') {
+    $upload_dir = __DIR__ . '/../uploads/products/';
+    $allowed_exts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    // Mime type trình duyệt gửi lên (không dùng finfo_open)
+    $allowed_mimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    $max_size = 5 * 1024 * 1024; // 5MB
+
+    if (!isset($_FILES[$file_input_name]) || $_FILES[$file_input_name]['error'] === UPLOAD_ERR_NO_FILE) {
+        return null; // Không có file upload
+    }
+
+    $file = $_FILES[$file_input_name];
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        http_response_code(400);
+        echo json_encode(["message" => "Lỗi upload ảnh: code " . $file['error']]);
+        exit();
+    }
+
+    if ($file['size'] > $max_size) {
+        http_response_code(400);
+        echo json_encode(["message" => "Ảnh quá lớn! Tối đa 5MB."]);
+        exit();
+    }
+
+    // Kiểm tra extension
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowed_exts)) {
+        http_response_code(400);
+        echo json_encode(["message" => "Chỉ chấp nhận ảnh: JPG, PNG, GIF, WEBP."]);
+        exit();
+    }
+
+    // Kiểm tra mime type từ $_FILES (browser gửi lên)
+    if (!in_array($file['type'], $allowed_mimes)) {
+        http_response_code(400);
+        echo json_encode(["message" => "File không phải ảnh hợp lệ."]);
+        exit();
+    }
+
+    // Tạo thư mục nếu chưa có
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+
+    // Tạo tên file duy nhất
+    $filename = uniqid('product_', true) . '.' . $ext;
+    $dest = $upload_dir . $filename;
+
+    if (!move_uploaded_file($file['tmp_name'], $dest)) {
+        http_response_code(500);
+        echo json_encode(["message" => "Không thể lưu ảnh. Kiểm tra quyền thư mục uploads/products/"]);
+        exit();
+    }
+
+    return $filename;
+}
+
+// Lấy dữ liệu từ form (hỗ trợ cả JSON và multipart/form-data)
+function getInputData($input_data_global) {
+    // Nếu có $_POST data (multipart/form-data) thì ưu tiên dùng
+    if (!empty($_POST)) {
+        return $_POST;
+    }
+    // Fallback về JSON body
+    return $input_data_global;
+}
+
 switch ($method) {
     case 'GET':
         if ($id) {
@@ -25,58 +94,103 @@ switch ($method) {
         break;
 
     case 'POST':
-        if (isset($input_data['name']) && isset($input_data['price']) && isset($input_data['category_id'])) {
+        $data = getInputData($input_data);
+
+        if (isset($data['name']) && isset($data['price']) && isset($data['category_id'])) {
+            // Xử lý upload ảnh
+            $image_filename = handleImageUpload('image');
+
+            // Nếu không upload file mới, lấy tên ảnh từ text input (nếu có)
+            if ($image_filename === null) {
+                $image_filename = isset($data['image']) ? $data['image'] : null;
+            }
+
             $query = "INSERT INTO products (name, price, description, image, category_id, created_at, stock, status) 
                       VALUES (:name, :price, :description, :image, :category_id, :created_at, :stock, :status)";
             $stmt = $conn->prepare($query);
-            
-            $description = isset($input_data['description']) ? $input_data['description'] : null;
-            $image = isset($input_data['image']) ? $input_data['image'] : null;
-            $createdAt = isset($input_data['created_at']) ? $input_data['created_at'] : date('Y-m-d H:i:s');
-            $stock = isset($input_data['stock']) ? $input_data['stock'] : 0;
-            $status = isset($input_data['status']) ? $input_data['status'] : 0; 
 
-            $stmt->bindParam(':name', $input_data['name']);
-            $stmt->bindParam(':price', $input_data['price']);
+            $description = isset($data['description']) ? $data['description'] : null;
+            $createdAt = date('Y-m-d H:i:s');
+            $stock = isset($data['stock']) ? (int)$data['stock'] : 0;
+            $status = isset($data['status']) ? (int)$data['status'] : 0;
+
+            $stmt->bindParam(':name', $data['name']);
+            $stmt->bindParam(':price', $data['price']);
             $stmt->bindParam(':description', $description);
-            $stmt->bindParam(':image', $image);
-            $stmt->bindParam(':category_id', $input_data['category_id']);
+            $stmt->bindParam(':image', $image_filename);
+            $stmt->bindParam(':category_id', $data['category_id']);
             $stmt->bindParam(':created_at', $createdAt);
             $stmt->bindParam(':stock', $stock);
             $stmt->bindParam(':status', $status);
 
             if ($stmt->execute()) {
+                $new_id = $conn->lastInsertId();
                 http_response_code(201);
-                echo json_encode(["message" => "Thêm sản phẩm thành công"]);
+                echo json_encode([
+                    "message" => "Thêm sản phẩm thành công",
+                    "id" => $new_id,
+                    "image" => $image_filename
+                ]);
             } else {
                 http_response_code(500);
                 echo json_encode(["message" => "Lỗi thêm sản phẩm"]);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "Thiếu thông tin bắt buộc (name, price, category_id)"]);
+            echo json_encode([
+                "message" => "Thiếu thông tin sản phẩm",
+                "received_post" => array_keys($data ?? []),
+                "has_files" => !empty($_FILES),
+                "content_type" => $contentType
+            ]);
         }
         break;
 
     case 'PUT':
-        if ($id && !empty($input_data)) {
+        $data = getInputData($input_data);
+
+        if ($id && !empty($data)) {
             $fields = [];
             $params = [':id' => $id];
 
-            if (isset($input_data['name'])) { $fields[] = "name = :name"; $params[':name'] = $input_data['name']; }
-            if (isset($input_data['price'])) { $fields[] = "price = :price"; $params[':price'] = $input_data['price']; }
-            if (isset($input_data['description'])) { $fields[] = "description = :description"; $params[':description'] = $input_data['description']; }
-            if (isset($input_data['image'])) { $fields[] = "image = :image"; $params[':image'] = $input_data['image']; }
-            if (isset($input_data['category_id'])) { $fields[] = "category_id = :category_id"; $params[':category_id'] = $input_data['category_id']; }
-            if (isset($input_data['stock'])) { $fields[] = "stock = :stock"; $params[':stock'] = $input_data['stock']; }
-            if (isset($input_data['status'])) { $fields[] = "status = :status"; $params[':status'] = $input_data['status']; }
+            if (isset($data['name']))        { $fields[] = "name = :name";               $params[':name'] = $data['name']; }
+            if (isset($data['price']))       { $fields[] = "price = :price";             $params[':price'] = $data['price']; }
+            if (isset($data['description'])) { $fields[] = "description = :description"; $params[':description'] = $data['description']; }
+            if (isset($data['category_id'])) { $fields[] = "category_id = :category_id"; $params[':category_id'] = $data['category_id']; }
+            if (isset($data['stock']))       { $fields[] = "stock = :stock";             $params[':stock'] = (int)$data['stock']; }
+            if (isset($data['status']))      { $fields[] = "status = :status";           $params[':status'] = (int)$data['status']; }
+
+            // Xử lý upload ảnh mới (nếu có)
+            $new_image = handleImageUpload('image');
+            if ($new_image !== null) {
+                // Xóa ảnh cũ nếu là ảnh do hệ thống tạo (có prefix product_)
+                $old_stmt = $conn->prepare("SELECT image FROM products WHERE id = :id");
+                $old_stmt->bindParam(':id', $id);
+                $old_stmt->execute();
+                $old_product = $old_stmt->fetch(PDO::FETCH_ASSOC);
+                if ($old_product && $old_product['image'] && strpos($old_product['image'], 'product_') === 0) {
+                    $old_image_path = __DIR__ . '/../uploads/products/' . $old_product['image'];
+                    if (file_exists($old_image_path)) {
+                        @unlink($old_image_path);
+                    }
+                }
+                $fields[] = "image = :image";
+                $params[':image'] = $new_image;
+            } elseif (isset($data['image'])) {
+                // Cập nhật tên ảnh text nếu không upload file
+                $fields[] = "image = :image";
+                $params[':image'] = $data['image'];
+            }
 
             if (count($fields) > 0) {
                 $query = "UPDATE products SET " . implode(", ", $fields) . " WHERE id = :id";
                 $stmt = $conn->prepare($query);
 
                 if ($stmt->execute($params)) {
-                    echo json_encode(["message" => "Cập nhật sản phẩm thành công"]);
+                    echo json_encode([
+                        "message" => "Cập nhật sản phẩm thành công",
+                        "image" => $new_image
+                    ]);
                 } else {
                     http_response_code(500);
                     echo json_encode(["message" => "Lỗi cập nhật sản phẩm"]);
@@ -94,6 +208,18 @@ switch ($method) {
     case 'DELETE':
         if ($id) {
             try {
+                // Xóa ảnh khi xóa sản phẩm
+                $old_stmt = $conn->prepare("SELECT image FROM products WHERE id = :id");
+                $old_stmt->bindParam(':id', $id);
+                $old_stmt->execute();
+                $old_product = $old_stmt->fetch(PDO::FETCH_ASSOC);
+                if ($old_product && $old_product['image'] && strpos($old_product['image'], 'product_') === 0) {
+                    $old_image_path = __DIR__ . '/../uploads/products/' . $old_product['image'];
+                    if (file_exists($old_image_path)) {
+                        @unlink($old_image_path);
+                    }
+                }
+
                 $stmt = $conn->prepare("DELETE FROM products WHERE id = :id");
                 $stmt->bindParam(':id', $id);
                 if ($stmt->execute()) {

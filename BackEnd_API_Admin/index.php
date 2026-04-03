@@ -4,9 +4,14 @@ error_reporting(E_ALL);
 
 // Cấu hình CORS chung
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, X-HTTP-Method-Override");
+
+// Chỉ set Content-Type JSON nếu không phải multipart form (upload ảnh)
+$contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
+if (strpos($contentType, 'multipart/form-data') === false) {
+    header("Content-Type: application/json; charset=UTF-8");
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200); exit();
@@ -16,6 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 require_once 'config/database.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
+
+// Hỗ trợ _method override qua FormData (vì PHP không nhận $_FILES với PUT)
+if ($method === 'POST' && isset($_POST['_method'])) {
+    $method = strtoupper($_POST['_method']);
+}
+
 $request_path = isset($_GET['request']) ? $_GET['request'] : '';
 $request = explode('/', trim($request_path, '/'));
 $endpoint = isset($request[0]) ? $request[0] : '';
