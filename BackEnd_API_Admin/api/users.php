@@ -30,6 +30,7 @@ if ($method == 'GET') {
         http_response_code(400);
         echo json_encode(["message" => "Thiếu thông tin người dùng"]);
     }
+    //ádadacdfdfafasfas
 } elseif ($method == 'PUT') {
     if ($id && isset($input_data['name']) && isset($input_data['email']) && isset($input_data['role'])) {
         $query = "UPDATE users SET name = :name, email = :email, role = :role WHERE id = :id";

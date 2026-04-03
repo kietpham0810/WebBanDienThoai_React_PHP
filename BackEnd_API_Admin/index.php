@@ -29,7 +29,7 @@ if (empty($endpoint)) {
     exit();
 }
 
-// Tìm file tương ứng trong thư mục api/
+
 $api_file = 'api/' . $endpoint . '.php';
 
 if (file_exists($api_file)) {
