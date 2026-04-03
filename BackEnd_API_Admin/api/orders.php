@@ -1,24 +1,6 @@
 <?php
-// Cấu hình Header cho phép CORS
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-include_once '../config/database.php';
-
-$method = $_SERVER['REQUEST_METHOD'];
-$id = isset($_GET['id']) ? $_GET['id'] : null;
-$input_data = json_decode(file_get_contents("php://input"), true);
-
 switch ($method) {
     case 'GET':
-        // Giữ nguyên đoạn code xuất sắc của fen, tui chỉ đưa vào case thôi
         if ($id) {
             $orderQuery = "SELECT o.*, u.name as customer_name FROM orders o LEFT JOIN users u ON o.user_id = u.id WHERE o.id = :id";
             $stmt = $conn->prepare($orderQuery);
@@ -50,7 +32,6 @@ switch ($method) {
         break;
 
     case 'POST':
-        // Cập nhật: Thêm tính năng tạo đơn hàng với địa chỉ và phương thức thanh toán
         if (!empty($input_data['user_id']) && !empty($input_data['total'])) {
             $query = "INSERT INTO orders (user_id, order_date, total, status, shipping_address, payment_method) 
                       VALUES (:user_id, :order_date, :total, :status, :shipping_address, :payment_method)";
@@ -69,7 +50,6 @@ switch ($method) {
             $stmt->bindParam(':payment_method', $payment_method);
             
             if ($stmt->execute()) {
-                // Rất quan trọng: Trả về order_id để Front-end tiếp tục gọi API thêm chi tiết đơn hàng
                 $last_id = $conn->lastInsertId();
                 http_response_code(201);
                 echo json_encode(["message" => "Tạo đơn hàng thành công", "order_id" => $last_id]);
@@ -84,7 +64,6 @@ switch ($method) {
         break;
 
     case 'PUT':
-        // Tối ưu: Dynamic Update - Giờ không chỉ đổi trạng thái, mà khách lỡ nhập sai địa chỉ cũng sửa được luôn
         if ($id && !empty($input_data)) {
             $fields = [];
             $params = [':id' => $id];
@@ -114,15 +93,12 @@ switch ($method) {
         break;
 
     case 'DELETE':
-        // Bổ sung tính năng Xóa an toàn chống văng lỗi khóa ngoại
         if ($id) {
             try {
-                // Phải xóa các chi tiết đơn hàng (order_details) trước rồi mới xóa đơn (orders) được
                 $stmtDetails = $conn->prepare("DELETE FROM order_details WHERE order_id = :id");
                 $stmtDetails->bindParam(':id', $id);
                 $stmtDetails->execute();
 
-                // Sau đó mới xóa đơn hàng chính
                 $stmt = $conn->prepare("DELETE FROM orders WHERE id = :id");
                 $stmt->bindParam(':id', $id);
                 

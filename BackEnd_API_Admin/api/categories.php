@@ -1,22 +1,4 @@
 <?php
-// Cấu hình Header cho phép CORS
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-// Xử lý preflight request từ Front-end
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-include_once '../config/database.php';
-
-$method = $_SERVER['REQUEST_METHOD'];
-$id = isset($_GET['id']) ? $_GET['id'] : null;
-$input_data = json_decode(file_get_contents("php://input"), true);
-
 switch ($method) {
     case 'GET':
         if ($id) {
@@ -68,7 +50,6 @@ switch ($method) {
 
     case 'DELETE':
         if ($id) {
-            // Giữ lại try-catch xịn xò của fen để chặn lỗi khóa ngoại
             try {
                 $stmt = $conn->prepare("DELETE FROM categories WHERE id = :id");
                 $stmt->bindParam(':id', $id);
@@ -79,7 +60,7 @@ switch ($method) {
                     echo json_encode(["message" => "Lỗi hệ thống khi xóa danh mục"]);
                 }
             } catch (PDOException $e) {
-                http_response_code(409); // Đổi thành 409 Conflict cho chuẩn RESTful
+                http_response_code(409); 
                 echo json_encode(["message" => "Không thể xóa: Danh mục này đang chứa sản phẩm!"]);
             }
         } else {

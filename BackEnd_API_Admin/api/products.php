@@ -1,23 +1,4 @@
 <?php
-// Cấu hình Header cho phép CORS (Nếu file chưa có thì nhớ thêm vào)
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-// Gọi kết nối Database của fen vào đây (ví dụ: include_once 'database.php';)
-include_once '../config/database.php';
-
-$method = $_SERVER['REQUEST_METHOD'];
-$id = isset($_GET['id']) ? $_GET['id'] : null;
-$input_data = json_decode(file_get_contents("php://input"), true);
-
-// Câu lệnh gốc dùng chung cho GET (Có JOIN bảng categories siêu xịn của fen)
 $base_query = "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id";
 
 switch ($method) {
@@ -30,7 +11,6 @@ switch ($method) {
             $product = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode($product ? $product : ["message" => "Không tìm thấy sản phẩm"]);
         } else {
-            // Tối ưu: Thêm bộ lọc status để Front-end Khách hàng chỉ lấy sp Đang bán (status = 1)
             if (isset($_GET['status'])) {
                 $query = $base_query . " WHERE p.status = :status ORDER BY p.id DESC";
                 $stmt = $conn->prepare($query);
@@ -45,7 +25,6 @@ switch ($method) {
         break;
 
     case 'POST':
-        // Cập nhật: Thêm trường stock và status vào lúc tạo mới
         if (isset($input_data['name']) && isset($input_data['price']) && isset($input_data['category_id'])) {
             $query = "INSERT INTO products (name, price, description, image, category_id, created_at, stock, status) 
                       VALUES (:name, :price, :description, :image, :category_id, :created_at, :stock, :status)";
@@ -55,7 +34,7 @@ switch ($method) {
             $image = isset($input_data['image']) ? $input_data['image'] : null;
             $createdAt = isset($input_data['created_at']) ? $input_data['created_at'] : date('Y-m-d H:i:s');
             $stock = isset($input_data['stock']) ? $input_data['stock'] : 0;
-            $status = isset($input_data['status']) ? $input_data['status'] : 0; // Mặc định 0: Chờ duyệt/Ẩn
+            $status = isset($input_data['status']) ? $input_data['status'] : 0; 
 
             $stmt->bindParam(':name', $input_data['name']);
             $stmt->bindParam(':price', $input_data['price']);
@@ -80,8 +59,6 @@ switch ($method) {
         break;
 
     case 'PUT':
-        // Tối ưu Tối thượng: Cập nhật động (Dynamic Update)
-        // Không bắt buộc phải truyền đủ các trường, truyền lên trường nào update trường đó
         if ($id && !empty($input_data)) {
             $fields = [];
             $params = [':id' => $id];
@@ -116,7 +93,6 @@ switch ($method) {
 
     case 'DELETE':
         if ($id) {
-            // Tối ưu: Bắt lỗi nếu sản phẩm này đã nằm trong đơn hàng (khóa ngoại)
             try {
                 $stmt = $conn->prepare("DELETE FROM products WHERE id = :id");
                 $stmt->bindParam(':id', $id);
@@ -127,8 +103,8 @@ switch ($method) {
                     echo json_encode(["message" => "Không thể xóa sản phẩm này"]);
                 }
             } catch (PDOException $e) {
-                http_response_code(409); // Xung đột dữ liệu
-                echo json_encode(["message" => "Không thể xóa: Sản phẩm này đang nằm trong đơn hàng của khách! Hãy thử Ẩn sản phẩm thay vì Xóa."]);
+                http_response_code(409);
+                echo json_encode(["message" => "Không thể xóa: Sản phẩm này đang nằm trong đơn hàng! Hãy thử Ẩn sản phẩm thay vì Xóa."]);
             }
         } else {
             http_response_code(400);
@@ -137,7 +113,7 @@ switch ($method) {
         break;
 
     default:
-        http_response_code(405); // Method Not Allowed
+        http_response_code(405);
         echo json_encode(["message" => "Phương thức không được hỗ trợ"]);
         break;
 }
