@@ -137,6 +137,7 @@ switch ($method) {
             }
         } else {
             http_response_code(400);
+            $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
             echo json_encode([
                 "message" => "Thiếu thông tin sản phẩm",
                 "received_post" => array_keys($data ?? []),
@@ -186,11 +187,17 @@ switch ($method) {
                 $query = "UPDATE products SET " . implode(", ", $fields) . " WHERE id = :id";
                 $stmt = $conn->prepare($query);
 
+                // THAY ĐỔI Ở ĐÂY: Thêm bẫy rowCount()
                 if ($stmt->execute($params)) {
-                    echo json_encode([
-                        "message" => "Cập nhật sản phẩm thành công",
-                        "image" => $new_image
-                    ]);
+                    if ($stmt->rowCount() > 0) {
+                        echo json_encode([
+                            "message" => "Cập nhật sản phẩm thành công",
+                            "image" => $new_image
+                        ]);
+                    } else {
+                        http_response_code(404);
+                        echo json_encode(["message" => "Lỗi: Không tìm thấy sản phẩm với ID này (hoặc dữ liệu chưa được thay đổi)!"]);
+                    }
                 } else {
                     http_response_code(500);
                     echo json_encode(["message" => "Lỗi cập nhật sản phẩm"]);
@@ -223,7 +230,12 @@ switch ($method) {
                 $stmt = $conn->prepare("DELETE FROM products WHERE id = :id");
                 $stmt->bindParam(':id', $id);
                 if ($stmt->execute()) {
-                    echo json_encode(["message" => "Xóa sản phẩm thành công"]);
+                    if ($stmt->rowCount() > 0) {
+                        echo json_encode(["message" => "Xóa sản phẩm thành công"]);
+                    } else {
+                        http_response_code(404);
+                        echo json_encode(["message" => "Lỗi: Không tìm thấy sản phẩm với ID này để xóa!"]);
+                    }
                 } else {
                     http_response_code(500);
                     echo json_encode(["message" => "Không thể xóa sản phẩm này"]);
