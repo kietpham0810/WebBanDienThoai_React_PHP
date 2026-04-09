@@ -67,6 +67,22 @@ const parseResponseBody = async (response: Response) => {
   }
 };
 
+const isHtmlPayload = (contentType: string, payload: unknown) => {
+  if (contentType.includes('text/html')) {
+    return true;
+  }
+
+  const message =
+    payload &&
+    typeof payload === 'object' &&
+    'message' in payload &&
+    typeof payload.message === 'string'
+      ? payload.message
+      : '';
+
+  return /<!doctype html>|<html/i.test(message);
+};
+
 const request = async <T>(path: string, options: RequestOptions = {}): Promise<T> => {
   const url = resolveUrl(path, options.params);
   const controller = new AbortController();
@@ -101,6 +117,10 @@ const request = async <T>(path: string, options: RequestOptions = {}): Promise<T
         (payload && (payload.message || payload.error)) ||
         `${response.status} ${response.statusText}`;
       throw new Error(message);
+    }
+
+    if (isHtmlPayload(response.headers.get('content-type') ?? '', payload)) {
+      throw new Error('API trả về HTML thay vì JSON. Hãy kiểm tra lại URL API hoặc cấu hình proxy.');
     }
 
     if (response.status === 204) {

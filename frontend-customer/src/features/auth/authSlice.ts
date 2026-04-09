@@ -1,20 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+import type { AuthUser, LoginResponse } from '../../services/authService';
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   token: string | null;
   isAuthenticated: boolean;
 }
 
 const storage = typeof window !== 'undefined' ? window.localStorage : null;
 
-const readStoredUser = (): User | null => {
+const readStoredUser = (): AuthUser | null => {
   const rawUser = storage?.getItem('user');
 
   if (!rawUser) {
@@ -22,7 +17,7 @@ const readStoredUser = (): User | null => {
   }
 
   try {
-    return JSON.parse(rawUser) as User;
+    return JSON.parse(rawUser) as AuthUser;
   } catch {
     return null;
   }
@@ -40,7 +35,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginSuccess: (state, action: PayloadAction<{ user: User; token: string }>) => {
+    loginSuccess: (state, action: PayloadAction<LoginResponse>) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
@@ -54,7 +49,7 @@ const authSlice = createSlice({
       storage?.removeItem('user');
       storage?.removeItem('token');
     },
-    updateUser: (state, action: PayloadAction<User>) => {
+    updateUser: (state, action: PayloadAction<AuthUser>) => {
       state.user = action.payload;
       storage?.setItem('user', JSON.stringify(action.payload));
     },

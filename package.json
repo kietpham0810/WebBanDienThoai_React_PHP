@@ -1,0 +1,9 @@
+{
+  "name": "web-bandienthoai-react-php",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend-customer run dev",
+    "build": "npm --prefix frontend-customer run build",
+    "lint": "npm --prefix frontend-customer run lint"
+  }
+}
