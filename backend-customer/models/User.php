@@ -9,14 +9,16 @@ class User extends BaseModel
     public function create(array $data): array
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO users (name, email, password, role)
-             VALUES (:name, :email, :password, :role)"
+            "INSERT INTO users (name, email, password, role, phone, address)
+             VALUES (:name, :email, :password, :role, :phone, :address)"
         );
         $stmt->execute([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => password_hash($data['password'], PASSWORD_DEFAULT),
-            'role' => $data['role'] ?? 'user'
+            'role' => $data['role'] ?? 'user',
+            'phone' => $data['phone'] ?? null,
+            'address' => $data['address'] ?? null
         ]);
 
         return $this->getById((int)$this->db->lastInsertId());
@@ -24,7 +26,7 @@ class User extends BaseModel
 
     public function update(int $id, array $data): ?array
     {
-        $sql = "UPDATE users SET name = :name, email = :email, role = :role";
+        $sql = "UPDATE users SET name = :name, email = :email, role = :role, phone = :phone, address = :address";
         if (!empty($data['password'])) {
             $sql .= ", password = :password";
         }
@@ -34,6 +36,8 @@ class User extends BaseModel
             'name' => $data['name'],
             'email' => $data['email'],
             'role' => $data['role'] ?? 'user',
+            'phone' => $data['phone'] ?? null,
+            'address' => $data['address'] ?? null,
             'id' => $id
         ];
         if (!empty($data['password'])) {

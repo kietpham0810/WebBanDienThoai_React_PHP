@@ -67,6 +67,9 @@ try {
             foreach (['name', 'price', 'category_id'] as $field) {
                 if (empty($data[$field])) respond(422, ['error' => "$field is required"]);
             }
+            // stock và status là optional, có default value
+            if (!isset($data['stock'])) $data['stock'] = 0;
+            if (!isset($data['status'])) $data['status'] = 0;
             $created = $productModel->create($data);
             respond(201, $created);
 
@@ -74,9 +77,10 @@ try {
         case 'PATCH':
             if ($id === null) respond(400, ['error' => 'ID is required']);
             $data = getJsonBody();
-            foreach (['name', 'price', 'category_id'] as $field) {
-                if (empty($data[$field])) respond(422, ['error' => "$field is required"]);
-            }
+            if (empty($data)) respond(422, ['error' => 'Request body is required']);
+            // Set default values nếu không được cung cấp
+            if (!isset($data['stock'])) $data['stock'] = 0;
+            if (!isset($data['status'])) $data['status'] = 0;
             $updated = $productModel->update($id, $data);
             if (!$updated) respond(404, ['error' => 'Product not found']);
             respond(200, $updated);

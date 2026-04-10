@@ -9,8 +9,8 @@ class Product extends BaseModel
     public function create(array $data): array
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO products (name, price, description, image, category_id, created_at)
-             VALUES (:name, :price, :description, :image, :category_id, :created_at)"
+            "INSERT INTO products (name, price, description, image, category_id, created_at, stock, status)
+             VALUES (:name, :price, :description, :image, :category_id, :created_at, :stock, :status)"
         );
 
         $stmt->execute([
@@ -19,7 +19,9 @@ class Product extends BaseModel
             'description' => $data['description'] ?? null,
             'image' => $data['image'] ?? null,
             'category_id' => $data['category_id'],
-            'created_at' => $data['created_at'] ?? date('Y-m-d H:i:s')
+            'created_at' => $data['created_at'] ?? date('Y-m-d H:i:s'),
+            'stock' => $data['stock'] ?? 0,
+            'status' => $data['status'] ?? 0
         ]);
 
         return $this->getById((int)$this->db->lastInsertId());
@@ -29,7 +31,7 @@ class Product extends BaseModel
     {
         $stmt = $this->db->prepare(
             "UPDATE products SET name = :name, price = :price, description = :description,
-             image = :image, category_id = :category_id WHERE id = :id"
+             image = :image, category_id = :category_id, stock = :stock, status = :status WHERE id = :id"
         );
 
         $stmt->execute([
@@ -38,6 +40,8 @@ class Product extends BaseModel
             'description' => $data['description'] ?? null,
             'image' => $data['image'] ?? null,
             'category_id' => $data['category_id'],
+            'stock' => $data['stock'] ?? 0,
+            'status' => $data['status'] ?? 0,
             'id' => $id
         ]);
 

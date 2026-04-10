@@ -62,6 +62,10 @@ try {
             foreach (['user_id', 'total'] as $field) {
                 if (!isset($data[$field])) respond(422, ['error' => "$field is required"]);
             }
+            // status, shipping_address, payment_method là optional
+            if (!isset($data['status'])) $data['status'] = 'pending';
+            if (!isset($data['shipping_address'])) $data['shipping_address'] = null;
+            if (!isset($data['payment_method'])) $data['payment_method'] = null;
             $created = $orderModel->create($data);
             respond(201, $created);
 
@@ -69,9 +73,11 @@ try {
         case 'PATCH':
             if ($id === null) respond(400, ['error' => 'ID is required']);
             $data = getJsonBody();
-            foreach (['user_id', 'total', 'status'] as $field) {
-                if (!isset($data[$field])) respond(422, ['error' => "$field is required"]);
-            }
+            if (empty($data)) respond(422, ['error' => 'Request body is required']);
+            // Set default values nếu không được cung cấp
+            if (!isset($data['shipping_address'])) $data['shipping_address'] = null;
+            if (!isset($data['payment_method'])) $data['payment_method'] = null;
+            if (!isset($data['status'])) $data['status'] = 'pending';
             $updated = $orderModel->update($id, $data);
             if (!$updated) respond(404, ['error' => 'Order not found']);
             respond(200, $updated);

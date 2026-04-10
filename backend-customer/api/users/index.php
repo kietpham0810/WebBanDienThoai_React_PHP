@@ -78,9 +78,7 @@ try {
         case 'PATCH':
             if ($id === null) respond(400, ['error' => 'ID is required']);
             $data = getJsonBody();
-            foreach (['name', 'email'] as $field) {
-                if (empty($data[$field])) respond(422, ['error' => "$field is required"]);
-            }
+            if (empty($data)) respond(422, ['error' => 'Request body is required']);
             $updated = $userModel->update($id, $data);
             if (!$updated) respond(404, ['error' => 'User not found']);
             unset($updated['password']);
