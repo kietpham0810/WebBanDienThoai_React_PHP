@@ -6,7 +6,9 @@ import CategoriesView from '../views/CategoriesView.vue'
 import OrdersView from '../views/OrdersView.vue'
 
 const router = createRouter({
-  history: createWebHistory('/admin-ui/'),
+  // Khi chạy npm run dev, base là '/' để hoạt động ở localhost:5173
+  // Khi build production deploy vào /admin-ui/ thì đổi lại
+  history: createWebHistory('/'),
   routes: [
     {
       path: '/',

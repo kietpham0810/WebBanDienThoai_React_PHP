@@ -1,10 +1,26 @@
 import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_API_BASE || '/BackEnd_API_Admin/'
+// Lấy base URL từ biến môi trường hoặc mặc định
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  'http://localhost/web/WebBanDienThoai_React_PHP/BackEnd_API_Admin/index.php'
 
-export const apiClient = axios.create({
-  baseURL,
-  headers: {
-    'Content-Type': 'application/json',
+// Hàm tạo URL đúng: http://localhost/.../index.php?request=products/1
+function makeUrl(endpoint) {
+  return `${API_BASE}?request=${endpoint}`
+}
+
+export const apiClient = {
+  get(endpoint, params = {}) {
+    return axios.get(makeUrl(endpoint), { params })
   },
-})
+  post(endpoint, data, config = {}) {
+    return axios.post(makeUrl(endpoint), data, config)
+  },
+  put(endpoint, data, config = {}) {
+    return axios.put(makeUrl(endpoint), data, config)
+  },
+  delete(endpoint, config = {}) {
+    return axios.delete(makeUrl(endpoint), config)
+  },
+}

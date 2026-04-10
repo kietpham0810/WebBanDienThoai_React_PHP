@@ -1,8 +1,9 @@
 import { apiClient } from './apiClient'
 
-// Base URL cho ảnh sản phẩm
+// Base URL cho ảnh sản phẩm (tĩnh - đọc từ XAMPP)
 export const PRODUCT_IMAGE_BASE_URL =
-  'http://localhost/WebBanDienThoai_React_PHP/BackEnd_API_Admin/uploads/products/'
+  (import.meta.env.VITE_API_BASE || 'http://localhost/WebBanDienThoai_React_PHP/BackEnd_API_Admin/index.php')
+    .replace('/index.php', '') + '/uploads/products/'
 
 export const productService = {
   getAll: async () => {
