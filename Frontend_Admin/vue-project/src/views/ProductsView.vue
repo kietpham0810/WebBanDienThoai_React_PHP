@@ -237,7 +237,7 @@ onMounted(async () => {
             class="input"
             type="text"
             placeholder="VD: iPhone 15 Pro Max"
-            required
+            
           />
         </div>
 
@@ -253,7 +253,7 @@ onMounted(async () => {
             type="number"
             min="0"
             placeholder="VD: 33990000"
-            required
+            
           />
         </div>
 
@@ -262,7 +262,7 @@ onMounted(async () => {
           <label class="label" for="product-category">
             Danh mục <span class="required">*</span>
           </label>
-          <select id="product-category" v-model="form.category_id" class="select" required>
+          <select id="product-category" v-model="form.category_id" class="select" >
             <option disabled value="">-- Chọn danh mục --</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}

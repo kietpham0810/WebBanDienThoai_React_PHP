@@ -3,8 +3,8 @@ import axios from 'axios'
 // Lấy base URL từ biến môi trường hoặc mặc định
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
-  'http://localhost/web/WebBanDienThoai_React_PHP/BackEnd_API_Admin/index.php'
-
+  // 'http://localhost/web/WebBanDienThoai_React_PHP/BackEnd_API_Admin/index.php'
+  'http://thu6chieunhom2-bandienthoai.kesug.com/index.php?request='
 // Hàm tạo URL đúng: http://localhost/.../index.php?request=products/1
 function makeUrl(endpoint) {
   return `${API_BASE}?request=${endpoint}`
