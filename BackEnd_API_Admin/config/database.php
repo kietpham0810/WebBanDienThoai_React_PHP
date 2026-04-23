@@ -1,6 +1,6 @@
 <?php
 // ==========================================
-// 1. CẤU HÌNH CORS + JSON
+// 1. KẾT NỐI DATABASE
 // ==========================================
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
@@ -40,7 +40,7 @@ try {
     $conn = new PDO("mysql:host=" . $host . ";dbname=" . $db_name, $username, $password);
     $conn->exec("set names utf8mb4");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(["message" => "Lỗi kết nối CSDL: " . $e->getMessage()]);
     exit();
